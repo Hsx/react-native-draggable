@@ -24,11 +24,13 @@ export default function Draggable(props) {
   const {
     renderText,
     isCircle,
+    borderColor,
     renderSize,
     imageSource,
     renderColor,
     children,
     shouldReverse,
+    isRadius,
     onReverse,
     disabled,
     debug,
@@ -170,7 +172,7 @@ export default function Draggable(props) {
       curPan.removeAllListeners();
     };
   }, [shouldReverse]);
-  
+
   const positionCss = React.useMemo(() => {
     const Window = Dimensions.get('window');
     return {
@@ -181,6 +183,18 @@ export default function Draggable(props) {
       height: Window.height,
     };
   }, []);
+
+ const _dragItemImgCss = (renderSize,isCircle, borderColor) => {
+  //  const { renderSize } = this.props;
+    return {
+    height: renderSize,
+    width: renderSize,
+    borderRadius: isCircle ? renderSize/2: 0,
+    borderColor:  borderColor ? borderColor: null,
+    borderWidth:  isCircle ? 1: 0,
+    };
+  };
+
 
   const dragItemCss = React.useMemo(() => {
     const style = {
@@ -195,7 +209,10 @@ export default function Draggable(props) {
     if (isCircle) {
       style.borderRadius = renderSize;
     }
-
+    if (borderColor) {
+      style.borderColor = borderColor;
+      style.borderWidth = 2;
+    }
     if (children) {
       return {
         ...style,
@@ -210,13 +227,16 @@ export default function Draggable(props) {
     };
   }, [children, isCircle, renderColor, renderSize, x, y, z]);
 
+
   const touchableContent = React.useMemo(() => {
     if (children) {
       return children;
     } else if (imageSource) {
+
       return (
         <Image
-          style={{width: renderSize, height: renderSize}}
+        //  style={{width: renderSize, height: renderSize}}
+          style={_dragItemImgCss(renderSize,isCircle,borderColor)}
           source={imageSource}
         />
       );
@@ -259,6 +279,7 @@ export default function Draggable(props) {
     );
   }, [maxX, maxY, minX, minY]);
 
+
   return (
     <View pointerEvents="box-none" style={positionCss}>
       {debug && getDebugView()}
@@ -286,9 +307,10 @@ export default function Draggable(props) {
 /***** Default props and types */
 
 Draggable.defaultProps = {
-  renderText: '＋',
+  renderText: 'ï¼‹',
   renderSize: 36,
   shouldReverse: false,
+  isRadius: false,
   disabled: false,
   debug: false,
   onDrag: () => {},
@@ -308,11 +330,13 @@ Draggable.propTypes = {
   renderText: PropTypes.string,
   isCircle: PropTypes.bool,
   renderSize: PropTypes.number,
-  imageSource: PropTypes.number,
+  imageSource: PropTypes.object,
   renderColor: PropTypes.string,
+  borderColor: PropTypes.string,
   /**** */
   children: PropTypes.element,
   shouldReverse: PropTypes.bool,
+  isRadius: PropTypes.bool,
   disabled: PropTypes.bool,
   debug: PropTypes.bool,
   animatedViewProps: PropTypes.object,
